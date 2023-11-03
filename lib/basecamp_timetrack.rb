@@ -59,16 +59,13 @@ module BasecampTimetrack
         }
       )
 
-      price_editor_project_id = 30_637_826
-      color_swatches_project_id = 30_647_993
-
       resp = @conn.get("my/profile.json")
       my_profile_id = JSON.parse(resp.body)["id"]
 
-      pe_comments = get_comments(price_editor_project_id)
-      cs_comments = get_comments(color_swatches_project_id)
-
-      all_comments = pe_comments + cs_comments
+      all_comments = []
+      ENV.fetch("PROJECT_IDS").split(",").each do |id|
+        all_comments += get_comments(id)
+      end
       filtered_comments = all_comments.select { |c| Date.parse(c["created_at"]) >= from }
 
       comments_grouped_by_tasks = filtered_comments.group_by { |c| c["parent"]["title"] }
