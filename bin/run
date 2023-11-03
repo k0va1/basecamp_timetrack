@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "basecamp_timetrack"
+
+BasecampTimetrack.run(from: Date.parse("2023-09-04"))
