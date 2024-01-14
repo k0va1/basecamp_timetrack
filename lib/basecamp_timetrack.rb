@@ -59,9 +59,6 @@ module BasecampTimetrack
         }
       )
 
-      resp = @conn.get("my/profile.json")
-      my_profile_id = JSON.parse(resp.body)["id"]
-
       all_comments = []
       ENV.fetch("PROJECT_IDS").split(",").each do |id|
         all_comments += get_comments(id)
