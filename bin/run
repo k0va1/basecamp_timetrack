@@ -4,4 +4,7 @@
 require "bundler/setup"
 require "basecamp_timetrack"
 
-BasecampTimetrack.run(from: Date.parse(ENV.fetch("FROM_DATE")))
+BasecampTimetrack.run(
+  from: Date.parse(ENV.fetch("FROM_DATE")),
+  to: Date.parse(ENV.fetch("TO_DATE"))
+)

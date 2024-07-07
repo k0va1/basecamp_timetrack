@@ -18,7 +18,7 @@ module BasecampTimetrack
   CONTENT_REGEX = %r{<div>\s*(?<input>#{TimeLog::LOG_REGEX})\s*</div>}
 
   class << self
-    def run(from: Date.today)
+    def run(from:, to:)
       client_id = ENV.fetch("CLIENT_ID")
       client_secret = ENV.fetch("CLIENT_SECRET")
 
@@ -63,7 +63,10 @@ module BasecampTimetrack
       ENV.fetch("PROJECT_IDS").split(",").each do |id|
         all_comments += get_comments(id)
       end
-      filtered_comments = all_comments.select { |c| Date.parse(c["created_at"]) >= from }
+      filtered_comments = all_comments.select do |c|
+        created_at = Date.parse(c["created_at"])
+        created_at >= from && created_at <= to
+      end
 
       comments_grouped_by_tasks = filtered_comments.group_by { |c| c["parent"]["title"] }
       task_summaries = comments_grouped_by_tasks.map do |title, comments|
@@ -71,7 +74,7 @@ module BasecampTimetrack
           input = c["content"].scan(CONTENT_REGEX).flatten.first
           TimeLog.new(input)
         end
-        TaskSummary.new(title: title, time_logs: time_logs)
+        TaskSummary.new(title:, time_logs:)
       end
       puts render_table(task_summaries)
 
@@ -118,7 +121,7 @@ module BasecampTimetrack
         bank_account_number: ENV.fetch("BANK_ACCOUNT_NUMBER"),
         account_iban: ENV.fetch("ACCOUNT_IBAN"),
         account_swift: ENV.fetch("ACCOUNT_SWIFT"),
-        items: items
+        items:
       )
 
       InvoicePrinter.print(
